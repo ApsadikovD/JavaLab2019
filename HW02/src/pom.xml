@@ -1,0 +1,40 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.test</groupId>
+    <artifactId>test</artifactId>
+    <version>0.0.1</version>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.fileloader</groupId>
+            <artifactId>fileloader</artifactId>
+            <version>0.0.4</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>main/java</sourceDirectory>
+        <testSourceDirectory>test/java</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.test.Test</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
