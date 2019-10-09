@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <form action="loader" method="post">
+        <input type="text" name="url1"><br>
+        <input id="send" type="submit">
+    </form>
+    <br>
+    <div id="add">Add additional field for URL</div>
+    <script>
+        var addBtn = document.getElementById("add");
+        var sendBtn = document.getElementById("send");
+        var counter = 1;
+        addBtn.addEventListener("click", function (ev) {
+            var newInput = document.createElement("input");
+            var newBr = document.createElement("br");
+            sendBtn.before(newInput);
+            sendBtn.before(newBr);
+
+            counter += 1;
+            newInput.setAttribute("type", "text");
+            newInput.setAttribute("name", "url" + counter);
+        });
+    </script>
+</body>
+</html>
