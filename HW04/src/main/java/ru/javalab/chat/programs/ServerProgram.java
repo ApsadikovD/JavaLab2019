@@ -10,9 +10,6 @@ import java.util.Properties;
 
 public class ServerProgram {
     public static void main(String[] args) {
-        args = new String[2];
-        args[0] = "--port=6000";
-        args[1] = "--db-properties-path=C:\\Users\\ponchik\\Downloads\\.properties";
         int port = 8000;
         String pathToProperties = "";
         for (String param : args) {
