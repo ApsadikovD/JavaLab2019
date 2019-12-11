@@ -13,11 +13,9 @@ import ru.javalab.chat.model.Cart;
 import ru.javalab.chat.protocol.*;
 import ru.javalab.chat.protocol.base.Request;
 import ru.javalab.chat.protocol.base.Response;
-import ru.javalab.chat.repositories.cart.CartRepositoryImpl;
-import ru.javalab.chat.repositories.message.MessageRepositoryImpl;
-import ru.javalab.chat.repositories.product.ProductRepositoryImpl;
 import ru.javalab.chat.services.cart.AddProductToCartService;
 import ru.javalab.chat.services.cart.AddProductToCartServiceImpl;
+import ru.javalab.chat.services.login.LoginService;
 import ru.javalab.chat.services.login.LoginServiceImpl;
 import ru.javalab.chat.services.message.AddMessageService;
 import ru.javalab.chat.services.message.AddMessageServiceImpl;
@@ -40,6 +38,7 @@ public class ClientThread extends Thread {
     private int userId;
     private String userName;
     private boolean isLogout;
+    private ApplicationContext applicationContext;
     private RequestsDispatcher requestsDispatcher;
 
     public ClientThread(Socket clientSocket) throws IOException {
@@ -48,8 +47,8 @@ public class ClientThread extends Thread {
         writer = new PrintWriter(clientSocket.getOutputStream(), true);
         isLogout = false;
 
-        ApplicationContext applicationContext = new ApplicationContextReflectionBased();
-        LoginServiceImpl loginService = applicationContext.getComponent(LoginServiceImpl.class, "loginService");
+        applicationContext = new ApplicationContextReflectionBased();
+        LoginService loginService = applicationContext.getComponent(LoginServiceImpl.class, "loginService");
         requestsDispatcher = new RequestsDispatcher();
         requestsDispatcher.addService("loginService", loginService);
     }
@@ -135,12 +134,14 @@ public class ClientThread extends Thread {
     }
 
     private void addCart(Request<CmdAddCart> cart) {
-        AddProductToCartService addProductToCartService = new AddProductToCartServiceImpl(new CartRepositoryImpl());
+        AddProductToCartService addProductToCartService = applicationContext
+                .getComponent(AddProductToCartServiceImpl.class, "addProductToCartService");
         addProductToCartService.addProductToCart(new Cart(userId, cart.getPayload().getProductId()));
     }
 
     private void messageGet(Request<CmdPagination> pagination) {
-        PaginationMessageService paginationMessageService = new PaginationMessageServiceImpl(new MessageRepositoryImpl());
+        PaginationMessageService paginationMessageService = applicationContext
+                .getComponent(PaginationMessageServiceImpl.class, "paginationMessageService");
         List<MessageDto> messageDtoList = paginationMessageService.find(pagination.getPayload().getPage());
         write(getJson(Response.build(messageDtoList)));
     }
@@ -151,23 +152,27 @@ public class ClientThread extends Thread {
                 write(userName + ": " + message.getPayload().getMessage());
             }
         }
-        AddMessageService addMessageService = new AddMessageServiceImpl(new MessageRepositoryImpl());
+        AddMessageService addMessageService = applicationContext
+                .getComponent(AddMessageServiceImpl.class, "addMessageService");
         addMessageService.save(message.getPayload().getMessage(), userId);
     }
 
     private void productGet(Request<CmdPagination> pagination) {
-        PaginationProductService paginationProductService = new PaginationProductServiceImpl(new ProductRepositoryImpl());
+        PaginationProductService paginationProductService = applicationContext
+                .getComponent(PaginationProductServiceImpl.class, "paginationProductService");
         List<ProductDto> productList = paginationProductService.find(pagination.getPayload().getPage());
         write(getJson(Response.build(productList)));
     }
 
     private void productDelete(Request<CmdDeleteProduct> product) {
-        DeleteProductServiceImpl productService = new DeleteProductServiceImpl(new ProductRepositoryImpl());
+        DeleteProductService productService = applicationContext
+                .getComponent(DeleteProductServiceImpl.class, "deleteProductService");
         productService.deleteProduct(product.getPayload().getId());
     }
 
     private void productAdd(Request<CmdAddProduct> product) {
-        AddProductService addProductService = new AddProductServiceImpl(new ProductRepositoryImpl());
+        AddProductService addProductService = applicationContext
+                .getComponent(AddProductServiceImpl.class, "addProductService");
         addProductService.addProduct(product.getPayload().getName(), Float.parseFloat(product.getPayload().getPrice()));
     }
 
